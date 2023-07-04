@@ -8,7 +8,7 @@ namespace AlatorX.Server.Management.Domain.Commons
     public class Auditable
     {
         public long? Id { get; set; }
-        public long CreatedAt { get; set; }
-        public long? UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 }

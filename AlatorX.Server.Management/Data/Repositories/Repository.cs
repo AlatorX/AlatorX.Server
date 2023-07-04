@@ -20,29 +20,41 @@ namespace AlatorX.Server.Management.Data.Repositories
             _dbSet = _dbContext.Set<TEntity>();
         }
 
-        public ValueTask<bool> DeleteAsync(long id)
+        public async ValueTask<bool> DeleteAsync(long id)
         {
-            throw new NotImplementedException();
+            var entity = await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+
+            _dbSet.Remove(entity);
+            
+            return await _dbContext.SaveChangesAsync() > 0;
         }
 
-        public ValueTask<TEntity> InsertAsync(TEntity entity)
+        public async ValueTask<TEntity> InsertAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            var entry = await _dbSet.AddAsync(entity);
+
+            await _dbContext.SaveChangesAsync();
+
+            return entry.Entity;
         }
 
         public IQueryable<TEntity> SelectAll()
         {
-            throw new NotImplementedException();
+            return _dbSet;
         }
 
-        public ValueTask<TEntity> SelectByIdAsync(long id)
+        public async ValueTask<TEntity> SelectByIdAsync(long id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public ValueTask<TEntity> UpdateAsync(TEntity entity)
+        public async ValueTask<TEntity> UpdateAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            var entry = _dbSet.Update(entity);
+
+            await _dbContext.SaveChangesAsync();
+
+            return entry.Entity;
         }
     }
 }
