@@ -38,6 +38,11 @@ namespace AlatorX.Server.Management.Data.Repositories
             return entry.Entity;
         }
 
+        public async ValueTask SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+
         public IQueryable<TEntity> SelectAll()
         {
             return _dbSet;

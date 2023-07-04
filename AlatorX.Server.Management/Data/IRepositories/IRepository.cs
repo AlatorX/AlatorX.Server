@@ -13,5 +13,6 @@ namespace AlatorX.Server.Management.Data.IRepositories
         ValueTask<TEntity> InsertAsync(TEntity entity);
         ValueTask<TEntity> UpdateAsync(TEntity entity);
         ValueTask<bool> DeleteAsync(long id);
+        ValueTask SaveChangesAsync();
     }
 }

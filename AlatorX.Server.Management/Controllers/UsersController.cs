@@ -23,8 +23,21 @@ namespace AlatorX.Server.Management.Controllers
         public async ValueTask<IActionResult> GetAsync([FromRoute(Name = "Id")] long id)
             => Ok(await _userService.RetrieveByIdAsync(id));
 
+        [HttpGet("Me")]
+        public async ValueTask<IActionResult> GetMeAsync()
+            => Ok(await _userService.GetMeAsync());
+
         [HttpPost, AllowAnonymous]
         public async ValueTask<IActionResult> PostAsync([FromBody] UserForCreationDto dto)
             => Ok(await _userService.AddAsync(dto));
+
+        [HttpPost("ApiKey")]
+        public async ValueTask<IActionResult> GenerateApiKeyAsync()
+            => Ok(await _userService.GenerateApiKeyAsync());
+
+        [HttpGet("ApiKey/{Id}")]
+        public async ValueTask<IActionResult> GetApiKeyByUserIdAsync([FromRoute(Name = "Id")] long id)
+            => Ok(await _userService.GetApiTokenByUserIdAsync(id));
+
     }
 }
