@@ -1,7 +1,9 @@
+using AlatorX.Server.Gateway.Configurations;
 using AlatorX.Server.Gateway.Data;
 using AlatorX.Server.Gateway.Middlewares;
 using AlatorX.Server.Gateway.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Yarp.ReverseProxy.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration
             .GetConnectionString("DefaultConnection")));
+
+builder.Services
+    .AddSingleton<IProxyConfigProvider>(new CustomProxyConfigProvider())
+    .AddReverseProxy();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -27,7 +33,12 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ApiKeyValidationMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapReverseProxy();
+});
 
 app.Run();

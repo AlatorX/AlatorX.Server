@@ -1,9 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AlatorX.Server.Management.Domain.Commons;
+using System.ComponentModel.DataAnnotations;
 
 namespace AlatorX.Server.Management.Domain.Entities
 {
@@ -14,5 +10,10 @@ namespace AlatorX.Server.Management.Domain.Entities
         
         public string Domain { get; set; }
         public string Port { get; set; }
+
+        public string ConfigString { get; set; }
+
+        public long UserId { get; set; }
+        public User User { get; set; }
     }
 }

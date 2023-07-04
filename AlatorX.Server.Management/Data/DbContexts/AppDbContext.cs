@@ -18,7 +18,5 @@ namespace AlatorX.Server.Management.Data.DbContexts
         public DbSet<User> Users { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<Website> Websites { get; set; }
-        public DbSet<UserWebsite> UserWebsites { get; set; }
-        public DbSet<WebsiteSetting> WebsiteSettings { get; set; }
     }
 }

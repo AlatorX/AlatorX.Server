@@ -1,4 +1,5 @@
-﻿using AlatorX.Server.Gateway.Repositories;
+﻿using AlatorX.Server.Gateway.Configurations;
+using AlatorX.Server.Gateway.Repositories;
 
 namespace AlatorX.Server.Gateway.Middlewares;
 
@@ -16,6 +17,7 @@ public class ApiKeyValidationMiddleware
     public async Task InvokeAsync(
         HttpContext context,
         IUserRepository userRepository,
+        CustomProxyConfigProvider proxyConfigProvider,
         ILogger<ApiKeyValidationMiddleware> logger)
     {
         try
@@ -40,6 +42,12 @@ public class ApiKeyValidationMiddleware
         {
             logger.LogError(exception.Message);
         }
+    }
+
+    private void UpdateProxyConfig(
+        CustomProxyConfigProvider proxyConfigProvider)
+    {
+
     }
 
     private bool IsValidApiKey(string apiKey) =>

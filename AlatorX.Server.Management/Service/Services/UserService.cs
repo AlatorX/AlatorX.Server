@@ -18,27 +18,24 @@ namespace AlatorX.Server.Management.Service.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<UserToken> _userTokenRepository;
-        private readonly IRepository<UserWebsite> _userWebsiteRepository;
-        private readonly IRepository<WebsiteSetting> _websiteSettingRepository;
+        private readonly IRepository<Website> _websiteRepository;
         private readonly IMapper _mapper;
 
         public UserService(IRepository<User> userRepository, IMapper mapper,
             IRepository<UserToken> userTokenRepository, 
-            IRepository<UserWebsite> userWebsiteRepository, 
-            IRepository<WebsiteSetting> websiteSettingRepository)
+            IRepository<Website> websiteRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userTokenRepository = userTokenRepository;
-            _userWebsiteRepository = userWebsiteRepository;
-            _websiteSettingRepository = websiteSettingRepository;
+            _websiteRepository = websiteRepository;
         }
 
         public async ValueTask<UserForResultDto> AddAsync(UserForCreationDto dto)
         {
-            // TODO: check for exist
             var isExist = _userRepository.SelectAll()
                 .Any(u => u.Email.ToLower() == dto.Email.ToLower());
+
             if(isExist)
                 throw new AlatorException(400, "User is already exist in this mail");
             
@@ -86,14 +83,12 @@ namespace AlatorX.Server.Management.Service.Services
             }
         }
 
-        public async ValueTask<IEnumerable<UserWebsite>> GetAllWebsitesAsync()
+        public async ValueTask<IEnumerable<Website>> GetAllWebsitesAsync()
         {
             var userId = HttpContextHelper.UserId ?? throw new UnauthorizedAccessException();
             
-            return await _userWebsiteRepository.SelectAll()
+            return await _websiteRepository.SelectAll()
                 .Where(uw => uw.UserId == userId)
-                .Include(uw => uw.WebsiteSetting)
-                .ThenInclude(ws => ws.Website)
                 .ToListAsync();
         }
 
