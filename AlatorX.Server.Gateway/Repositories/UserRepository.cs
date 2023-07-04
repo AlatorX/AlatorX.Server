@@ -1,4 +1,6 @@
 ﻿using AlatorX.Server.Gateway.Data;
+using AlatorX.Server.Gateway.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlatorX.Server.Gateway.Repositories;
 
@@ -11,8 +13,8 @@ public class UserRepository : IUserRepository
         this.appDbContext = appDbContext;
     }
 
-    public Task<bool> IsApiKeyExistsAsync(string apiKey)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<bool> IsApiKeyExistsAsync(string apiKey) =>
+        await this.appDbContext
+            .Set<UserToken>()
+            .AnyAsync(userToken => userToken.ApiKey == apiKey);
 }

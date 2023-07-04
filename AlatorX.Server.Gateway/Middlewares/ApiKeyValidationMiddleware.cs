@@ -15,23 +15,31 @@ public class ApiKeyValidationMiddleware
 
     public async Task InvokeAsync(
         HttpContext context,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ILogger<ApiKeyValidationMiddleware> logger)
     {
-        string apiKey = context.Request.Query[ApiKeyQueryParameter];
-
-        if(!IsValidApiKey(apiKey))
+        try
         {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return;
-        }
+            string apiKey = context.Request.Query[ApiKeyQueryParameter];
 
-        if(!await userRepository.IsApiKeyExistsAsync(apiKey))
+            if (!IsValidApiKey(apiKey))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }
+
+            if (!await userRepository.IsApiKeyExistsAsync(apiKey))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
+            }
+
+            await _next(context);
+        }
+        catch(Exception exception)
         {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return;
+            logger.LogError(exception.Message);
         }
-
-        await _next(context);
     }
 
     private bool IsValidApiKey(string apiKey) =>

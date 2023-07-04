@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AlatorX.Server.Gateway.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlatorX.Server.Gateway.Data;
 
@@ -8,4 +9,6 @@ public class AppDbContext : DbContext
         : base(options)
     {
     }
+
+    public DbSet<UserToken> UserTokens { get; set; }
 }
