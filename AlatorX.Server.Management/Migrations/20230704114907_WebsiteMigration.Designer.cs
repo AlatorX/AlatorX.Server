@@ -3,6 +3,7 @@ using System;
 using AlatorX.Server.Management.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlatorX.Server.Management.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230704114907_WebsiteMigration")]
+    partial class WebsiteMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,14 +101,14 @@ namespace AlatorX.Server.Management.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("WebsiteSettingId")
+                    b.Property<long>("WebsiteId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WebsiteSettingId");
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("UserWebsites");
                 });
@@ -173,15 +176,15 @@ namespace AlatorX.Server.Management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AlatorX.Server.Management.Domain.Entities.WebsiteSetting", "WebsiteSetting")
+                    b.HasOne("AlatorX.Server.Management.Domain.Entities.Website", "Website")
                         .WithMany()
-                        .HasForeignKey("WebsiteSettingId")
+                        .HasForeignKey("WebsiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
 
-                    b.Navigation("WebsiteSetting");
+                    b.Navigation("Website");
                 });
 
             modelBuilder.Entity("AlatorX.Server.Management.Domain.Entities.WebsiteSetting", b =>

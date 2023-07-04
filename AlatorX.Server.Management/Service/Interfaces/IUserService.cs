@@ -14,5 +14,6 @@ namespace AlatorX.Server.Management.Service.Interfaces
         ValueTask<UserToken> GenerateApiKeyAsync();
         ValueTask<string> GetApiTokenByUserIdAsync(long userId);
         ValueTask<UserForResultDto> GetMeAsync();
+        ValueTask<IEnumerable<UserWebsite>> GetAllWebsitesAsync();
     }
 }

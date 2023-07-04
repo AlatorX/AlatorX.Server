@@ -25,6 +25,7 @@ namespace AlatorX.Server.Management.Extensions
             
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IWebsiteService, WebsiteService>();
         }
 
         // <summary>

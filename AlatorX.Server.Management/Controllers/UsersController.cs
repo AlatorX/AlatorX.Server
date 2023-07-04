@@ -39,5 +39,8 @@ namespace AlatorX.Server.Management.Controllers
         public async ValueTask<IActionResult> GetApiKeyByUserIdAsync([FromRoute(Name = "Id")] long id)
             => Ok(await _userService.GetApiTokenByUserIdAsync(id));
 
+        [HttpGet("Websites")]
+        public async ValueTask<IActionResult> GetAllWebsitesAsync()
+            => Ok(await _userService.GetAllWebsitesAsync());
     }
 }

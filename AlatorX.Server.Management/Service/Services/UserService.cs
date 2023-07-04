@@ -18,14 +18,20 @@ namespace AlatorX.Server.Management.Service.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<UserToken> _userTokenRepository;
+        private readonly IRepository<UserWebsite> _userWebsiteRepository;
+        private readonly IRepository<WebsiteSetting> _websiteSettingRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IRepository<User> userRepository, IMapper mapper, 
-        IRepository<UserToken> userTokenRepository)
+        public UserService(IRepository<User> userRepository, IMapper mapper,
+            IRepository<UserToken> userTokenRepository, 
+            IRepository<UserWebsite> userWebsiteRepository, 
+            IRepository<WebsiteSetting> websiteSettingRepository)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userTokenRepository = userTokenRepository;
+            _userWebsiteRepository = userWebsiteRepository;
+            _websiteSettingRepository = websiteSettingRepository;
         }
 
         public async ValueTask<UserForResultDto> AddAsync(UserForCreationDto dto)
@@ -78,6 +84,17 @@ namespace AlatorX.Server.Management.Service.Services
 
                 return userToken;
             }
+        }
+
+        public async ValueTask<IEnumerable<UserWebsite>> GetAllWebsitesAsync()
+        {
+            var userId = HttpContextHelper.UserId ?? throw new UnauthorizedAccessException();
+            
+            return await _userWebsiteRepository.SelectAll()
+                .Where(uw => uw.UserId == userId)
+                .Include(uw => uw.WebsiteSetting)
+                .ThenInclude(ws => ws.Website)
+                .ToListAsync();
         }
 
         public async ValueTask<string> GetApiTokenByUserIdAsync(long userId)

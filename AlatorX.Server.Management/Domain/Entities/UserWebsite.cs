@@ -11,7 +11,7 @@ namespace AlatorX.Server.Management.Domain.Entities
         public long UserId { get; set; }
         public User User { get; set; }
 
-        public long WebsiteId { get; set; }
-        public Website Website { get; set; }
+        public long WebsiteSettingId { get; set; }
+        public WebsiteSetting WebsiteSetting { get; set; }
     }
 }
