@@ -22,5 +22,13 @@ namespace AlatorX.Server.Management.Controllers
         [HttpPost]
         public async ValueTask<IActionResult> PostAsync(WebsiteForCreationDto dto)
             => Ok(await _websiteService.AddAsync(dto));
+
+        [HttpPut("{Id}")]
+        public async ValueTask<IActionResult> PutAsync([FromRoute(Name = "Id")] long id, WebsiteForCreationDto dto)
+            => Ok(await _websiteService.ModifyAsync(id, dto));
+
+        [HttpGet]
+        public async ValueTask<IActionResult> GetAllAsync()
+            => Ok(await _websiteService.RetrieveAllAsync());
     }
 }
