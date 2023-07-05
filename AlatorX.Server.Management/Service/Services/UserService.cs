@@ -60,7 +60,7 @@ namespace AlatorX.Server.Management.Service.Services
                 rng.GetBytes(randomBytes);
             }
 
-            var apiKey = Convert.ToBase64String(randomBytes);
+            var apiKey = Convert.ToBase64String(randomBytes).Replace("+", "");
 
             // insert api key
             var userToken = await _userTokenRepository.SelectAll()
