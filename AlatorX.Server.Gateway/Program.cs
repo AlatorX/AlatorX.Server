@@ -35,7 +35,13 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -46,6 +52,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseMiddleware<ApiKeyValidationMiddleware>();
 
 app.UseHttpsRedirection();
