@@ -1,5 +1,5 @@
-﻿using AlatorX.Server.Gateway.Configurations;
-using AlatorX.Server.Gateway.Repositories;
+﻿using AlatorX.Server.Gateway.Repositories;
+using Yarp.ReverseProxy.Configuration;
 
 namespace AlatorX.Server.Gateway.Middlewares;
 
@@ -17,20 +17,19 @@ public class ApiKeyValidationMiddleware
     public async Task InvokeAsync(
         HttpContext context,
         IUserRepository userRepository,
-        CustomProxyConfigProvider proxyConfigProvider,
         ILogger<ApiKeyValidationMiddleware> logger)
     {
         try
         {
             string apiKey = context.Request.Query[ApiKeyQueryParameter];
 
-            if (!IsValidApiKey(apiKey))
+            if (!IsValidString(apiKey))
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
             }
 
-            if (!await userRepository.IsApiKeyExistsAsync(apiKey))
+            if (!(await userRepository.IsApiKeyExistsAsync(apiKey)))
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
@@ -44,12 +43,13 @@ public class ApiKeyValidationMiddleware
         }
     }
 
-    private void UpdateProxyConfig(
-        CustomProxyConfigProvider proxyConfigProvider)
-    {
-
-    }
-
-    private bool IsValidApiKey(string apiKey) =>
+    private bool IsValidString(string apiKey) =>
         !string.IsNullOrEmpty(apiKey);
+}
+
+
+public class Request
+{
+    public List<RouteConfig> Routes { get; set; }
+    public List<ClusterConfig> Clusters { get; set; }
 }

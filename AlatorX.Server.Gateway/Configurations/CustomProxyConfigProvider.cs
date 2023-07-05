@@ -1,55 +1,61 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using AlatorX.Server.Gateway.Middlewares;
+using AlatorX.Server.Gateway.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using Yarp.ReverseProxy.Configuration;
 
 namespace AlatorX.Server.Gateway.Configurations;
 
 public class CustomProxyConfigProvider : IProxyConfigProvider
 {
-   
-    private CustomMemoryConfig memoryConfig;
+    private readonly InMemoryConfigProvider configuration = new(
+        Array.Empty<Yarp.ReverseProxy.Configuration.RouteConfig>(),
+        Array.Empty<Yarp.ReverseProxy.Configuration.ClusterConfig>());
 
-    public CustomProxyConfigProvider()
+    private readonly IServiceProvider serviceProvider;
+
+    public CustomProxyConfigProvider(IServiceProvider serviceProvider)
     {
-        memoryConfig = new CustomMemoryConfig(
-            Array.Empty<RouteConfig>(),
-            Array.Empty<ClusterConfig>());
+        this.serviceProvider = serviceProvider;
+
+        _ = Task.Run(UpdateConfigAsync);
     }
 
-    public IProxyConfig GetConfig() => this.memoryConfig;
+    public IProxyConfig GetConfig() => this.configuration.GetConfig();
 
-    public void Update(
-        IReadOnlyList<RouteConfig> routes,
-        IReadOnlyList<ClusterConfig> clusters)
+    public async Task UpdateConfigAsync()
     {
-        var oldConfig = this.memoryConfig;
+        using var scope = this.serviceProvider.CreateScope();
+        var websiteRepository = scope.ServiceProvider.GetRequiredService<IWebsiteRepository>();
 
-        this.memoryConfig = new CustomMemoryConfig(routes, clusters);
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
 
-        oldConfig.SignalChange();
-    }
-
-    private class CustomMemoryConfig : IProxyConfig
-    {
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
-        public CustomMemoryConfig(
-            IReadOnlyList<RouteConfig> routes,
-            IReadOnlyList<ClusterConfig> clusters)
+        do
         {
-            Routes = routes;
-            Clusters = clusters;
-            ChangeToken = new CancellationChangeToken(_cts.Token);
-        }
+            try
+            {
+                var websiteConfigurations = await websiteRepository
+                    .SelectAllWebsites()
+                    .Select(website => website.ConfigString)
+                    .ToListAsync();
 
-        public IReadOnlyList<RouteConfig> Routes { get; }
+                var routes = new List<RouteConfig>();
+                var clusters = new List<ClusterConfig>();
 
-        public IReadOnlyList<ClusterConfig> Clusters { get; }
+                foreach (string configuration in websiteConfigurations)
+                {
+                    var siteConfigDeserialization = JsonSerializer.Deserialize<Request>(configuration);
 
-        public IChangeToken ChangeToken { get; }
+                    routes.AddRange(siteConfigDeserialization.Routes);
+                    clusters.AddRange(siteConfigDeserialization.Clusters);
+                }
 
-        internal void SignalChange()
-        {
-            _cts.Cancel();
-        }
+                this.configuration.Update(routes, clusters);
+            }
+            catch(Exception exception)
+            {
+
+            }
+        } while (await timer.WaitForNextTickAsync());
     }
 }
