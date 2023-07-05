@@ -29,7 +29,7 @@ builder.Services.AddRateLimiter(options =>
                 AutoReplenishment = true,
                 PermitLimit = 5,
                 QueueLimit = 0,
-                Window = TimeSpan.FromMinutes(1)
+                Window = TimeSpan.FromSeconds(1)
             }));
 });
 
