@@ -11,6 +11,9 @@ using AlatorX.Server.Management.Service.Interfaces;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using AlatorX.Server.Management.Models;
+using MailKit.Net.Smtp;
+using MimeKit;
 
 namespace AlatorX.Server.Management.Service.Services
 {
@@ -20,15 +23,18 @@ namespace AlatorX.Server.Management.Service.Services
         private readonly IRepository<UserToken> _userTokenRepository;
         private readonly IRepository<Website> _websiteRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
         public UserService(IRepository<User> userRepository, IMapper mapper,
             IRepository<UserToken> userTokenRepository, 
-            IRepository<Website> websiteRepository)
+            IRepository<Website> websiteRepository,
+            IConfiguration configuration)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userTokenRepository = userTokenRepository;
             _websiteRepository = websiteRepository;
+            _configuration = configuration.GetSection("Email");
         }
 
         public async ValueTask<UserForResultDto> AddAsync(UserForCreationDto dto)
@@ -120,6 +126,28 @@ namespace AlatorX.Server.Management.Service.Services
                 throw new AlatorException(404, "User not found");
 
             return _mapper.Map<UserForResultDto>(user);    
+        }
+
+        public async ValueTask SendMessageToEmail(Message message)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse(_configuration["EmailAddress"]));
+            email.To.Add(MailboxAddress.Parse(message.To));
+
+            email.Subject = message.Subject;
+
+            email.Body = new TextPart("html")
+            {
+                Text = message.Body
+            };
+
+            var smpt = new SmtpClient();
+            await smpt.ConnectAsync(_configuration["Host"], 587, MailKit.Security.SecureSocketOptions.StartTls);
+            await smpt.AuthenticateAsync(_configuration["EmailAddress"], _configuration["Password"]);
+
+            await smpt.SendAsync(email);
+
+            await smpt.DisconnectAsync(true);
         }
     }
 }
