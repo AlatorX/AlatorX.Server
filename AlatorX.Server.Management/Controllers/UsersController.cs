@@ -44,6 +44,7 @@ namespace AlatorX.Server.Management.Controllers
         public async ValueTask<IActionResult> GetAllWebsitesAsync()
             => Ok(await _userService.GetAllWebsitesAsync());
 
+        [AllowAnonymous]
         [HttpPost("MessageSendByEmail")]
         public async ValueTask<IActionResult> SendMessageToEmailAsync(Message message)
         {
