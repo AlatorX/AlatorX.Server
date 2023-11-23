@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AlatorX.Server.Management.Models;
 using AlatorX.Server.Management.Service.DTOs.Users;
 using AlatorX.Server.Management.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -42,5 +43,12 @@ namespace AlatorX.Server.Management.Controllers
         [HttpGet("Websites")]
         public async ValueTask<IActionResult> GetAllWebsitesAsync()
             => Ok(await _userService.GetAllWebsitesAsync());
+
+        [HttpPost("MessageSendByEmail")]
+        public async ValueTask<IActionResult> SendMessageToEmailAsync(Message message)
+        {
+            await _userService.SendMessageToEmail(message);
+            return Ok();
+        }
     }
 }
